@@ -115,7 +115,7 @@ function ChatPage() {
   }, [messages, thinking]);
 
   const firstName = useMemo(
-    () => (profile.data?.full_name ?? "Teman").split(" ")[0],
+    () => (profile.data?.full_name ?? "Teman").split(" ")[0] ?? "Teman",
     [profile.data],
   );
 
@@ -140,7 +140,10 @@ function ChatPage() {
 
   async function deleteConversation(id: string) {
     const { error } = await supabase.from("conversations").delete().eq("id", id);
-    if (error) return toast.error("Gagal menghapus percakapan.");
+    if (error) {
+      toast.error("Gagal menghapus percakapan.");
+      return;
+    }
     if (id === conversationId) newChat();
     qc.invalidateQueries({ queryKey: ["conversations"] });
     toast.success("Percakapan dihapus.");
@@ -149,7 +152,10 @@ function ChatPage() {
   async function pickFiles(list: FileList | null) {
     if (!list) return;
     const room = MAX_FILES - files.length;
-    if (room <= 0) return toast.error(`Maksimal ${MAX_FILES} file sekaligus.`);
+    if (room <= 0) {
+      toast.error(`Maksimal ${MAX_FILES} file sekaligus.`);
+      return;
+    }
     const chosen = Array.from(list).slice(0, room);
     if (list.length > room) toast.error(`Maksimal ${MAX_FILES} file sekaligus.`);
     const encoded: Pending[] = [];
@@ -171,7 +177,10 @@ function ChatPage() {
   function toggleMic() {
     const SR =
       (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
-    if (!SR) return toast.error("Perangkat ini tidak mendukung input suara.");
+    if (!SR) {
+      toast.error("Perangkat ini tidak mendukung input suara.");
+      return;
+    }
     if (listening) {
       recRef.current?.stop();
       setListening(false);
