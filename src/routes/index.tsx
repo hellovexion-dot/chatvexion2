@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, Sparkles, ShieldCheck, Zap } from "lucide-react";
 import { VexionLogo } from "@/components/vexion/VexionLogo";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -31,6 +32,17 @@ function Landing() {
     const t = setTimeout(() => setSplash(false), 1600);
     return () => clearTimeout(t);
   }, []);
+
+  // Kembali dari Google OAuth: kalau sesi sudah ada, langsung ke chat.
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) navigate({ to: "/chat", replace: true });
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (session) navigate({ to: "/chat", replace: true });
+    });
+    return () => sub.subscription.unsubscribe();
+  }, [navigate]);
 
   if (splash) {
     return (
