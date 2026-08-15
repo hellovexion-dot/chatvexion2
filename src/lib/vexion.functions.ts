@@ -82,6 +82,7 @@ export const sendMessage = createServerFn({ method: "POST" })
     const { generateWithRotation, defaultKeys, QuotaExhaustedError } = await import(
       "./gemini.server"
     );
+    const { generateWithLovable } = await import("./lovable-ai.server");
 
     if (!data.content.trim() && data.attachments.length === 0) {
       throw new Error("Pesan kosong.");
@@ -161,7 +162,22 @@ export const sendMessage = createServerFn({ method: "POST" })
 
     let reply: string;
     try {
-      reply = await generateWithRotation(keys.filter(Boolean), contents);
+      const usable = keys.filter(Boolean);
+      if (mode === "custom" && usable.length > 0) {
+        try {
+          reply = await generateWithRotation(usable, contents);
+        } catch (err) {
+          if (!(err instanceof QuotaExhaustedError)) throw err;
+          reply = await generateWithLovable(contents);
+        }
+      } else {
+        try {
+          reply = await generateWithLovable(contents);
+        } catch (err) {
+          if (usable.length === 0) throw err;
+          reply = await generateWithRotation(usable, contents);
+        }
+      }
     } catch (e) {
       if (e instanceof QuotaExhaustedError) {
         throw new Error(
