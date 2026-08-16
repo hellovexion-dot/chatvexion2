@@ -4,7 +4,6 @@ import { toast } from "sonner";
 import { VexionLogo } from "@/components/vexion/VexionLogo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable/index";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
@@ -38,34 +37,15 @@ function AuthPage() {
 
   async function signIn() {
     setLoading(true);
-    const host = window.location.hostname;
-    const isLovableHost =
-      host.endsWith("lovable.app") || host.endsWith("lovable.dev") || host === "localhost";
-
-    // Broker OAuth Lovable (/~oauth/*) hanya ada di hosting Lovable.
-    // Di domain lain (mis. Vercel) pakai Supabase OAuth langsung.
-    if (!isLovableHost) {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: { redirectTo: `${window.location.origin}/auth` },
-      });
-      if (error) {
-        setLoading(false);
-        toast.error("Gagal masuk dengan Google. Coba lagi.");
-      }
-      return;
-    }
-
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+    // OAuth Google langsung ke backend (pakai Client ID/Secret milikmu sendiri).
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/auth` },
     });
-    if (result.error) {
+    if (error) {
       setLoading(false);
       toast.error("Gagal masuk dengan Google. Coba lagi.");
-      return;
     }
-    if (result.redirected) return;
-    navigate({ to: "/chat" });
   }
 
   return (
