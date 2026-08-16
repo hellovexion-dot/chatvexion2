@@ -34,9 +34,9 @@ export const Route = createFileRoute("/api/public/auth/callback")({
 
         let stored: { state: string; verifier: string; nonce: string };
         try {
-          stored = JSON.parse(
-            decodeURIComponent(oauthCookie.split("=")[1]),
-          ) as typeof stored;
+          const rawValue = oauthCookie.split("=")[1];
+          if (!rawValue) throw new Error("empty cookie value");
+          stored = JSON.parse(decodeURIComponent(rawValue)) as typeof stored;
         } catch {
           return new Response("Invalid OAuth state cookie", { status: 400 });
         }
