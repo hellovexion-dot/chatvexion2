@@ -49,7 +49,7 @@ export async function exchangeGoogleCode(params: {
   redirectUri: string;
   code: string;
   codeVerifier: string;
-}): Promise<{ id_token: string; access_token: string; refresh_token?: string }> {
+}): Promise<{ id_token: string; access_token: string; refresh_token: string | undefined }> {
   const body = new URLSearchParams({
     client_id: params.clientId,
     client_secret: params.clientSecret,
