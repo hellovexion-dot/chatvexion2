@@ -59,10 +59,17 @@ function AuthPage() {
     return () => sub.subscription.unsubscribe();
   }, [navigate]);
 
-  function signIn() {
+  async function signIn() {
     setLoading(true);
-    // OAuth Google langsung memakai ClientID/ClientSecret dari env Vercel.
-    window.location.href = `${window.location.origin}/api/public/auth/google`;
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin },
+    });
+
+    if (error || !data.url) {
+      setLoading(false);
+      toast.error(error?.message || "Gagal menghubungkan ke Google. Coba lagi.");
+    }
   }
 
   return (

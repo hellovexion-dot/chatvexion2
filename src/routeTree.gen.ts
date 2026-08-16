@@ -14,8 +14,6 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedChatRouteImport } from './routes/_authenticated/chat'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
-import { Route as ApiPublicAuthCallbackRouteImport } from './routes/api/public/auth/callback'
-import { Route as ApiPublicAuthGoogleRouteImport } from './routes/api/public/auth/google'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -41,32 +39,18 @@ const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const ApiPublicAuthCallbackRoute = ApiPublicAuthCallbackRouteImport.update({
-  id: '/api/public/auth/callback',
-  path: '/api/public/auth/callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicAuthGoogleRoute = ApiPublicAuthGoogleRouteImport.update({
-  id: '/api/public/auth/google',
-  path: '/api/public/auth/google',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/chat': typeof AuthenticatedChatRoute
   '/settings': typeof AuthenticatedSettingsRoute
-  '/api/public/auth/callback': typeof ApiPublicAuthCallbackRoute
-  '/api/public/auth/google': typeof ApiPublicAuthGoogleRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/chat': typeof AuthenticatedChatRoute
   '/settings': typeof AuthenticatedSettingsRoute
-  '/api/public/auth/callback': typeof ApiPublicAuthCallbackRoute
-  '/api/public/auth/google': typeof ApiPublicAuthGoogleRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -75,26 +59,12 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/chat': typeof AuthenticatedChatRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
-  '/api/public/auth/callback': typeof ApiPublicAuthCallbackRoute
-  '/api/public/auth/google': typeof ApiPublicAuthGoogleRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/auth'
-    | '/chat'
-    | '/settings'
-    | '/api/public/auth/callback'
-    | '/api/public/auth/google'
+  fullPaths: '/' | '/auth' | '/chat' | '/settings'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/auth'
-    | '/chat'
-    | '/settings'
-    | '/api/public/auth/callback'
-    | '/api/public/auth/google'
+  to: '/' | '/auth' | '/chat' | '/settings'
   id:
     | '__root__'
     | '/'
@@ -102,16 +72,12 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/chat'
     | '/_authenticated/settings'
-    | '/api/public/auth/callback'
-    | '/api/public/auth/google'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  ApiPublicAuthCallbackRoute: typeof ApiPublicAuthCallbackRoute
-  ApiPublicAuthGoogleRoute: typeof ApiPublicAuthGoogleRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -151,20 +117,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/api/public/auth/callback': {
-      id: '/api/public/auth/callback'
-      path: '/api/public/auth/callback'
-      fullPath: '/api/public/auth/callback'
-      preLoaderRoute: typeof ApiPublicAuthCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/auth/google': {
-      id: '/api/public/auth/google'
-      path: '/api/public/auth/google'
-      fullPath: '/api/public/auth/google'
-      preLoaderRoute: typeof ApiPublicAuthGoogleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -185,8 +137,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
-  ApiPublicAuthCallbackRoute: ApiPublicAuthCallbackRoute,
-  ApiPublicAuthGoogleRoute: ApiPublicAuthGoogleRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
