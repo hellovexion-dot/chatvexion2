@@ -84,6 +84,7 @@ function ChatPage() {
     queryFn: async () => {
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) return null;
+      const isAnonymous = auth.user.is_anonymous === true;
       const { data } = await supabase
         .from("profiles")
         .select("full_name, email, avatar_url")
@@ -91,8 +92,8 @@ function ChatPage() {
         .maybeSingle();
       return (
         data ?? {
-          full_name: auth.user.email?.split("@")[0] ?? "Teman",
-          email: auth.user.email ?? "",
+          full_name: isAnonymous ? "Tamu" : (auth.user.email?.split("@")[0] ?? "Teman"),
+          email: isAnonymous ? "Sesi tamu" : (auth.user.email ?? ""),
           avatar_url: null as string | null,
         }
       );
