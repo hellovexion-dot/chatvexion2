@@ -26,49 +26,26 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Tangkap token dari callback OAuth custom (hash fragment).
-    const hash = window.location.hash.slice(1);
-    const params = new URLSearchParams(hash);
-    const accessToken = params.get("access_token");
-    const refreshToken = params.get("refresh_token");
-
-    if (accessToken && refreshToken) {
-      supabase.auth
-        .setSession({
-          access_token: accessToken,
-          refresh_token: refreshToken,
-        })
-        .then(({ error }) => {
-          if (!error) {
-            window.location.hash = "";
-            navigate({ to: "/chat", replace: true });
-          } else {
-            setLoading(false);
-            toast.error("Gagal menyimpan sesi. Coba lagi.");
-          }
-        });
-      return;
-    }
-
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/chat" });
+      if (data.session) navigate({ to: "/chat", replace: true });
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      if (session) navigate({ to: "/chat" });
+      if (session) navigate({ to: "/chat", replace: true });
     });
     return () => sub.subscription.unsubscribe();
   }, [navigate]);
 
   async function signIn() {
     setLoading(true);
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth` },
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
 
-    if (error || !data.url) {
+    if (error) {
       setLoading(false);
-      toast.error(error?.message || "Gagal menghubungkan ke Google. Coba lagi.");
+      console.error("Login error:", error.message);
+      toast.error(error.message || "Gagal menghubungkan ke Google. Coba lagi.");
     }
   }
 
