@@ -24,6 +24,7 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [guestLoading, setGuestLoading] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -49,6 +50,18 @@ function AuthPage() {
     }
   }
 
+  async function signInGuest() {
+    setGuestLoading(true);
+    const { error } = await supabase.auth.signInAnonymously();
+    if (error) {
+      setGuestLoading(false);
+      console.error("Guest login error:", error.message);
+      toast.error(error.message || "Gagal masuk sebagai tamu. Coba lagi.");
+      return;
+    }
+    // onAuthStateChange akan mengarahkan ke /chat begitu sesi aktif.
+  }
+
   return (
     <main className="vex-page flex min-h-dvh flex-col items-center justify-center px-6">
       <div className="animate-fade-up vex-card w-full max-w-sm p-8 text-center">
@@ -62,15 +75,28 @@ function AuthPage() {
 
         <Button
           onClick={signIn}
-          disabled={loading}
+          disabled={loading || guestLoading}
           className="mt-7 h-12 w-full rounded-full bg-white text-[oklch(0.2_0.03_265)] hover:bg-white/90"
         >
           <GoogleMark />
           {loading ? "Menghubungkan…" : "Lanjut dengan Google"}
         </Button>
 
+        <Button
+          onClick={() => void signInGuest()}
+          disabled={loading || guestLoading}
+          variant="outline"
+          className="mt-3 h-12 w-full rounded-full border-dashed border-primary/40 bg-transparent text-foreground hover:bg-primary/10"
+        >
+          {guestLoading ? "Membuat sesi tamu…" : "Lanjut sebagai Tamu"}
+        </Button>
+
         <p className="mt-5 text-xs text-muted-foreground">
           Dengan melanjutkan kamu setuju percakapanmu disimpan di akunmu.
+        </p>
+        <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground/80">
+          Mode tamu menyimpan riwayat di perangkat ini selama sesi aktif.
+          Riwayat bisa hilang jika kamu keluar atau ganti perangkat.
         </p>
       </div>
     </main>
